@@ -10,6 +10,15 @@ class HeadPanel(wx.Panel):
 
         self.SetBackgroundColour((11, 11, 11))
 
+        img = wx.Image("imgs/logo.png", wx.BITMAP_TYPE_PNG)
+        self.bitmap = wx.BitmapFromImage(img)
+        
+        self.imgPane = wx.StaticBitmap(self, bitmap=self.bitmap)
+        
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        vbox.Add(self.imgPane,    0, wx.EXPAND, 0)
+        self.SetSizer(vbox)
+        
 
 class SourcePanel(wx.Panel):
     
