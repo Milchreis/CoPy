@@ -6,5 +6,7 @@ BUTTON_REMOVE_ALL="Alle entfernen"
 BUTTON_SET_DESTINATION="Wähle ein Ziel"
 BUTTON_BACKUP="Backup"
 
+DIALOG_SURE_REMOVE_ALL="Sind Sie sicher, dass alle Datensätze aus der Liste entfernt werden sollen? \n(Dateien bleiben erhalten)'"
 DIALOG_CHOOSE_DIRECTORY="Einen Ordner wählen"
+LABEL_REMOVE="Löschen"
 LABEL_TARGET="Ziel:"

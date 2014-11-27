@@ -1,6 +1,7 @@
 import wx
 import lang
 import main
+import model
 
 class HeadPanel(wx.Panel):
     
@@ -46,7 +47,7 @@ class SourcePanel(wx.Panel):
         
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         hbox.Add(self.sourclist,    2, wx.EXPAND | wx.ALL, 5)
-        hbox.Add(vbox,              2, wx.EXPAND | wx.ALL, 5)
+        hbox.Add(vbox,              1, wx.ALL, 5)
         
         self.SetSizer(hbox)
         
@@ -59,7 +60,15 @@ class SourcePanel(wx.Panel):
 
 
     def onRemoveAll(self, e):
-        pass
+        
+        if self.sourclist.GetCount() == 0:
+            return
+        
+        dial = wx.MessageDialog(self.parent, lang.DIALOG_SURE_REMOVE_ALL, 
+                        lang.LABEL_REMOVE+"?", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        
+        if dial.ShowModal() == wx.ID_YES:
+            self.parent.notify([model.REMOVE_ALL_SOURCES])
 
 
     def onAddSource(self, e):
@@ -69,11 +78,13 @@ class SourcePanel(wx.Panel):
         
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            self.parent.notify(['add', path])
+            self.parent.notify([model.ADD_SOURCE, path])
             
 
     def onRemoveSource(self, e):
-        pass
+        index = self.sourclist.GetSelection()
+        entry = self.sourclist.GetString(index)
+        self.parent.notify([model.REMOVE_SOURCE, entry])
 
     def onSelect(self, e):
         pass
@@ -95,7 +106,7 @@ class DestinationPanel(wx.Panel):
         
     def updateDestinationButton(self, path):
         
-        if not path == "" or not path == None:
+        if not path == "" and not path == None:
             self.setDestination.SetLabel(lang.LABEL_TARGET+" "+path)
         else:
             self.setDestination.SetLabel(lang.BUTTON_SET_DESTINATION)
@@ -107,7 +118,7 @@ class DestinationPanel(wx.Panel):
         
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            self.parent.notify(['destination', path])
+            self.parent.notify([model.DESTINATION, path])
             
             
 
@@ -127,7 +138,7 @@ class BackupPanel(wx.Panel):
         self.SetSizer(vbox)
         
     def onBackup(self, e):
-        pass
+        self.parent.notify([model.BACKUP])
     
 
 class MainWindow(wx.Frame):
@@ -156,7 +167,7 @@ class MainWindow(wx.Frame):
 
     def initUI(self):
         vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add(self.headpanel, 1, wx.EXPAND | wx.ALL, 0)
+        vbox.Add(self.headpanel, 0, wx.EXPAND | wx.ALL, 0)
         vbox.Add(self.sourcepanel, 2, wx.EXPAND | wx.ALL, 10)
         vbox.Add(self.destinationpanel, 0, wx.EXPAND | wx.ALL, 10)
         vbox.Add(self.backuppanel, 0, wx.EXPAND | wx.ALL, 10)
