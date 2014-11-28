@@ -1,6 +1,5 @@
 import wx
 import lang
-import main
 import model
 
 class HeadPanel(wx.Panel):
@@ -131,12 +130,13 @@ class BackupPanel(wx.Panel):
         
         self.backup = wx.Button(self, -1, lang.BUTTON_BACKUP)
         self.backup.Bind(wx.EVT_BUTTON, self.onBackup)
+        self.backup.Disable()
         
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.Add(self.backup, 0, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizer(vbox)
-        
+    
     def onBackup(self, e):
         self.parent.notify([model.BACKUP])
     
@@ -177,6 +177,11 @@ class MainWindow(wx.Frame):
     def update(self, model):
         self.sourcepanel.updateList(model.sources)
         self.destinationpanel.updateDestinationButton(model.destination)
+        
+        if len(model.sources) > 0 and not model.destination == None:
+            self.backuppanel.backup.Enable()
+        else:
+            self.backuppanel.backup.Disable()
     
     def notify(self, message):
         if not self.notifyHook == None:

@@ -1,8 +1,7 @@
+import shutil
 import gui
 import os
-import sys
 import fnmatch
-import time
 
 ADD_SOURCE="add"
 REMOVE_SOURCE="rem_src"
@@ -34,6 +33,7 @@ class AppController():
             self.appmodel.destination = message[1]
 
         if message[0] == BACKUP:
+            print self.appmodel.getNumberOfFiles()
             self.appmodel.backup()
         
         
@@ -58,18 +58,37 @@ class AppModel():
             self.sources.remove(src)
 
     def __walk(self, root='.', recurse=True, pattern='*'):
-        for path, subdirs, files in os.walk(root):
+        for path, _, files in os.walk(root):
             for name in files:
                 if fnmatch.fnmatch(name, pattern):
                     yield os.path.join(path, name)
                 if not recurse:
                     break
- 
- 
+  
     def backup(self):
+        
         for e in self.sources:
             for fspec in self.__walk(e):
-                print fspec +":"
-                print "  last modified: %s" % time.ctime(os.path.getmtime(fspec))
-                print "  created: %s" % time.ctime(os.path.getctime(fspec))
-                print " "
+                curFile = fspec[len(e)+1:]
+                destFile = os.path.join(self.destination, curFile)
+                
+                if os.path.isfile(destFile):
+                    lastModDest = os.path.getmtime(destFile)
+                    lastModOrg  = os.path.getmtime(fspec)
+                    
+                    delta = lastModOrg - lastModDest
+
+                    if delta >= 0:
+                        shutil.copyfile(fspec, destFile)
+                        print "copied: " + destFile
+                else:
+                    dirname = os.path.dirname(destFile)
+                    if not os.path.exists(dirname):
+                        os.makedirs(dirname)
+                        print "made dir " + dirname
+                        
+                    shutil.copy2(fspec, destFile)
+                    print "first copied " + destFile
+                    
+                
+                
