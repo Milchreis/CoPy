@@ -1,7 +1,7 @@
-import shutil
-import gui
 import os
-import fnmatch
+import gui
+import tools
+
 
 ADD_SOURCE="add"
 REMOVE_SOURCE="rem_src"
@@ -14,10 +14,24 @@ class AppController():
     
     def __init__(self):
         
-        self.appmodel = AppModel()
+        session = os.path.join(os.path.expanduser("~"), ".copySession")
+        
+        self.appmodel = AppModel(session)
         self.view = gui.MainWindow(None, -1, "")
         self.view.setNotifyHook(self.handleEvent)
+        self.waitview = gui.WaitDialog(self.view)
         
+        # read session file
+        if os.path.exists(session):
+            files = tools.readIn(session)
+            
+            if(len(files) >= 2):
+                self.appmodel.destination = files[0]
+                self.appmodel.setSource(files[1:])
+                    
+            self.view.update(self.appmodel)
+    
+            
     def handleEvent(self, message):
         
         if message[0] == ADD_SOURCE:
@@ -33,20 +47,33 @@ class AppController():
             self.appmodel.destination = message[1]
 
         if message[0] == BACKUP:
-            print self.appmodel.getNumberOfFiles()
-            self.appmodel.backup()
-        
+            
+            self.waitview = gui.WaitDialog(self.view)
+            po = tools.ParallelOperation(self.appmodel.backup, self.waitview.updateView)
+            po.start()
+
+            self.waitview.ShowModal()
+            self.waitview.Destroy()  
+            
         
         self.view.update(self.appmodel)
 
 
 class AppModel():
     
-    def __init__(self):
+    def __init__(self, session=None):
         
         self.sources = []
         self.destination = None
+        self.session = session
+        
+        self.__val = 0
+        self.__updateCallback = None
     
+    def setSource(self, array):
+        for e in array:
+            self.addSource(e)
+
     
     def addSource(self, src):
         if(not src in self.sources):
@@ -57,38 +84,35 @@ class AppModel():
         if(src in self.sources):
             self.sources.remove(src)
 
-    def __walk(self, root='.', recurse=True, pattern='*'):
-        for path, _, files in os.walk(root):
-            for name in files:
-                if fnmatch.fnmatch(name, pattern):
-                    yield os.path.join(path, name)
-                if not recurse:
-                    break
-  
-    def backup(self):
-        
-        for e in self.sources:
-            for fspec in self.__walk(e):
-                curFile = fspec[len(e)+1:]
-                destFile = os.path.join(self.destination, curFile)
-                
-                if os.path.isfile(destFile):
-                    lastModDest = os.path.getmtime(destFile)
-                    lastModOrg  = os.path.getmtime(fspec)
-                    
-                    delta = lastModOrg - lastModDest
 
-                    if delta >= 0:
-                        shutil.copyfile(fspec, destFile)
-                        print "copied: " + destFile
-                else:
-                    dirname = os.path.dirname(destFile)
-                    if not os.path.exists(dirname):
-                        os.makedirs(dirname)
-                        print "made dir " + dirname
-                        
-                    shutil.copy2(fspec, destFile)
-                    print "first copied " + destFile
+    def __backupupdate(self):
+        self.__val += 1
+        
+        if not self.__updateCallback == None:
+            self.__updateCallback(['num', self.__val])
+        
+  
+    def backup(self, updateCallback=None):
+        
+        # write session file
+        if not self.session == None:
+            save = []
+            save.append(self.destination)
+            save.extend(self.sources)
+            tools.writeOut(self.session, save)
+
+        if not updateCallback == None:
+            self.__updateCallback = updateCallback
+            
+            # Calculate number of files
+            numbers = tools.getNumberFiles(self.sources)
+            updateCallback(["max", numbers])
+            
+            for e in self.sources:
+                tools.backupfiles(e, self.destination, self.__backupupdate)
+
+            updateCallback(["end"])
+            self.__val = 0
+
                     
-                
                 

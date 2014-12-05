@@ -2,6 +2,50 @@ import wx
 import lang
 import model
 
+class WaitDialog(wx.Dialog):
+    
+    def __init__(self, *args, **kw):
+        super(WaitDialog, self).__init__(*args, **kw) 
+        self.SetSize((250, 100))
+        self.SetTitle(lang.LABEL_WAIT_HEADER)
+
+        self.max = 0
+        
+        self.label = wx.StaticText(self, label=lang.LABEL_WAIT_HEADER)
+        self.gauge = wx.Gauge(self, range=0)
+        
+        self.stop = wx.Button(self, label=lang.LABEL_CANCEL)
+        self.stop.Bind(wx.EVT_BUTTON, self.OnClose)
+        
+        hbox = wx.BoxSizer(wx.VERTICAL)
+        hbox.Add(self.label,    2, wx.EXPAND | wx.ALL, 5)
+        hbox.Add(self.gauge,    0, wx.EXPAND | wx.ALL, 5)
+        hbox.Add(self.stop,     0, wx.EXPAND | wx.ALL, 5)
+        
+        self.SetSizer(hbox)
+        
+        
+    def OnClose(self, e):
+        self.Destroy()
+        
+        
+    def updateView(self, param):
+        if len(param) > 0:
+
+            if param[0] == "num":
+                wx.CallAfter(self.gauge.SetValue, param[1])
+                wx.CallAfter(self.label.SetLabel, lang.LABEL_FILE_OF.format(param[1], self.max))
+            
+            if param[0] == "max":
+                wx.CallAfter(self.gauge.SetRange, param[1])
+                self.max = param[1]
+            
+            if param[0] == "end":
+                wx.CallAfter(self.SetTitle, lang.LABEL_READY_HEADER)
+                wx.CallAfter(self.label.SetLabel, lang.LABEL_FILE_OF.format(self.max, self.max))
+                wx.CallAfter(self.stop.SetLabel, lang.LABEL_CLOSE)
+    
+
 class HeadPanel(wx.Panel):
     
     def __init__(self, parent):
@@ -51,10 +95,10 @@ class SourcePanel(wx.Panel):
         self.SetSizer(hbox)
         
         
-    def updateList(self, list):
+    def updateList(self, listobj):
         self.sourclist.Clear()
         
-        for e in list:
+        for e in listobj:
             self.sourclist.Append(e)
 
 
@@ -127,7 +171,7 @@ class BackupPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
         self.parent = parent
-        
+              
         self.backup = wx.Button(self, -1, lang.BUTTON_BACKUP)
         self.backup.Bind(wx.EVT_BUTTON, self.onBackup)
         self.backup.Disable()
@@ -136,6 +180,7 @@ class BackupPanel(wx.Panel):
         vbox.Add(self.backup, 0, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizer(vbox)
+    
     
     def onBackup(self, e):
         self.parent.notify([model.BACKUP])
@@ -173,6 +218,10 @@ class MainWindow(wx.Frame):
         vbox.Add(self.backuppanel, 0, wx.EXPAND | wx.ALL, 10)
         
         self.SetSizer(vbox)
+
+    def setWaitState(self, current, maxValue, enableState):
+        self.backuppanel.updateWait(current, maxValue, enableState)
+
 
     def update(self, model):
         self.sourcepanel.updateList(model.sources)
