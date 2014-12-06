@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import wx
 import lang
 import model
@@ -6,15 +8,15 @@ class WaitDialog(wx.Dialog):
     
     def __init__(self, *args, **kw):
         super(WaitDialog, self).__init__(*args, **kw) 
-        self.SetSize((250, 100))
-        self.SetTitle(lang.LABEL_WAIT_HEADER)
+        self.SetSize((250, 120))
+        self.SetTitle(lang.LABEL_WAIT_HEADER.decode("utf-8"))
 
         self.max = 0
         
-        self.label = wx.StaticText(self, label=lang.LABEL_WAIT_HEADER)
+        self.label = wx.StaticText(self, label=lang.LABEL_WAIT_HEADER.decode("utf-8"))
         self.gauge = wx.Gauge(self, range=0)
         
-        self.stop = wx.Button(self, label=lang.LABEL_CANCEL)
+        self.stop = wx.Button(self, label=lang.LABEL_CANCEL.decode("utf-8"))
         self.stop.Bind(wx.EVT_BUTTON, self.OnClose)
         
         hbox = wx.BoxSizer(wx.VERTICAL)
@@ -41,15 +43,15 @@ class WaitDialog(wx.Dialog):
                 self.max = param[1]
             
             if param[0] == "end":
-                wx.CallAfter(self.SetTitle, lang.LABEL_READY_HEADER)
-                wx.CallAfter(self.label.SetLabel, lang.LABEL_FILE_OF.format(self.max, self.max))
-                wx.CallAfter(self.stop.SetLabel, lang.LABEL_CLOSE)
+                wx.CallAfter(self.SetTitle, lang.LABEL_READY_HEADER.decode("utf-8"))
+                wx.CallAfter(self.label.SetLabel, lang.LABEL_FILE_OF.format(self.max, self.max).decode("utf-8"))
+                wx.CallAfter(self.stop.SetLabel, lang.LABEL_CLOSE.decode("utf-8"))
     
 
 class HeadPanel(wx.Panel):
     
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+    def __init__(self, parent, parent2):
+        wx.Panel.__init__(self, parent=parent2, id=wx.ID_ANY)
         self.parent = parent
 
         self.SetBackgroundColour((11, 11, 11))
@@ -66,20 +68,20 @@ class HeadPanel(wx.Panel):
 
 class SourcePanel(wx.Panel):
     
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+    def __init__(self, parent, parent2):
+        wx.Panel.__init__(self, parent=parent2, id=wx.ID_ANY)
         self.parent = parent
     
         self.sourclist = wx.ListBox(self, 500)
         self.Bind(wx.EVT_LISTBOX, self.onSelect, id = 500)
         
-        self.addSource = wx.Button(self, -1, lang.BUTTON_ADD_SOURCE)
+        self.addSource = wx.Button(self, -1, lang.BUTTON_ADD_SOURCE.decode("utf-8"))
         self.addSource.Bind(wx.EVT_BUTTON, self.onAddSource)
         
-        self.removeSource = wx.Button(self, -1, lang.BUTTON_REMOVE_SOURCE)
+        self.removeSource = wx.Button(self, -1, lang.BUTTON_REMOVE_SOURCE.decode("utf-8"))
         self.removeSource.Bind(wx.EVT_BUTTON, self.onRemoveSource)
         
-        self.removeAll = wx.Button(self, -1, lang.BUTTON_REMOVE_ALL)
+        self.removeAll = wx.Button(self, -1, lang.BUTTON_REMOVE_ALL.decode("utf-8"))
         self.removeAll.Bind(wx.EVT_BUTTON, self.onRemoveAll)
         
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -117,7 +119,7 @@ class SourcePanel(wx.Panel):
     def onAddSource(self, e):
         
         path = ""
-        dlg = wx.DirDialog(self, message=lang.DIALOG_CHOOSE_DIRECTORY,  defaultPath='')
+        dlg = wx.DirDialog(self, message=lang.DIALOG_CHOOSE_DIRECTORY.decode("utf-8"),  defaultPath='')
         
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -135,11 +137,11 @@ class SourcePanel(wx.Panel):
 
 class DestinationPanel(wx.Panel):
     
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+    def __init__(self, parent, parent2):
+        wx.Panel.__init__(self, parent=parent2, id=wx.ID_ANY)
         self.parent = parent
         
-        self.setDestination = wx.Button(self, -1, lang.BUTTON_SET_DESTINATION)
+        self.setDestination = wx.Button(self, -1, lang.BUTTON_SET_DESTINATION.decode("utf-8"))
         self.setDestination.Bind(wx.EVT_BUTTON, self.onSetDestination)
         
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -152,12 +154,12 @@ class DestinationPanel(wx.Panel):
         if not path == "" and not path == None:
             self.setDestination.SetLabel(lang.LABEL_TARGET+" "+path)
         else:
-            self.setDestination.SetLabel(lang.BUTTON_SET_DESTINATION)
+            self.setDestination.SetLabel(lang.BUTTON_SET_DESTINATION.decode("utf-8"))
             
     
     def onSetDestination(self, e):
         path = ""
-        dlg = wx.DirDialog(self, message=lang.DIALOG_CHOOSE_DIRECTORY,  defaultPath='')
+        dlg = wx.DirDialog(self, message=lang.DIALOG_CHOOSE_DIRECTORY.decode("utf-8"),  defaultPath='')
         
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -168,11 +170,11 @@ class DestinationPanel(wx.Panel):
 
 class BackupPanel(wx.Panel):
     
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+    def __init__(self, parent, parent2):
+        wx.Panel.__init__(self, parent=parent2, id=wx.ID_ANY)
         self.parent = parent
               
-        self.backup = wx.Button(self, -1, lang.BUTTON_BACKUP)
+        self.backup = wx.Button(self, -1, lang.BUTTON_BACKUP.decode("utf-8"))
         self.backup.Bind(wx.EVT_BUTTON, self.onBackup)
         self.backup.Disable()
         
@@ -196,12 +198,17 @@ class MainWindow(wx.Frame):
         self.notifyHook = None
         
         self.SetTitle("CoPy - Backup")
-        self.SetSize((480, 400))
+        self.SetSize((560, 400))
         
-        self.headpanel          = HeadPanel(self)
-        self.sourcepanel        = SourcePanel(self)
-        self.destinationpanel   = DestinationPanel(self)
-        self.backuppanel        = BackupPanel(self)
+        self.winBox = wx.BoxSizer(wx.HORIZONTAL)
+        self.panel = wx.Panel(self)    
+        self.winBox.Add(self.panel, 0, wx.EXPAND | wx.ALL, 0)    
+        
+
+        self.headpanel          = HeadPanel(self, self.panel)
+        self.sourcepanel        = SourcePanel(self, self.panel)
+        self.destinationpanel   = DestinationPanel(self, self.panel)
+        self.backuppanel        = BackupPanel(self, self.panel)
         
         self.initUI()
         
@@ -211,13 +218,14 @@ class MainWindow(wx.Frame):
 
 
     def initUI(self):
+
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.Add(self.headpanel, 0, wx.EXPAND | wx.ALL, 0)
         vbox.Add(self.sourcepanel, 2, wx.EXPAND | wx.ALL, 10)
         vbox.Add(self.destinationpanel, 0, wx.EXPAND | wx.ALL, 10)
         vbox.Add(self.backuppanel, 0, wx.EXPAND | wx.ALL, 10)
-        
-        self.SetSizer(vbox)
+        self.panel.SetSizer(vbox)
+        self.SetSizer(self.winBox)
 
     def setWaitState(self, current, maxValue, enableState):
         self.backuppanel.updateWait(current, maxValue, enableState)
@@ -235,5 +243,4 @@ class MainWindow(wx.Frame):
     def notify(self, message):
         if not self.notifyHook == None:
             self.notifyHook(message) 
-
 
