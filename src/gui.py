@@ -3,6 +3,7 @@
 import wx
 import lang
 import model
+import tools
 
 class WaitDialog(wx.Dialog):
     
@@ -56,7 +57,7 @@ class HeadPanel(wx.Panel):
 
         self.SetBackgroundColour((11, 11, 11))
 
-        img = wx.Image("imgs/logo.png", wx.BITMAP_TYPE_PNG)
+        img = wx.Image(tools.getResource("imgs/logo.png"), wx.BITMAP_TYPE_PNG)
         self.bitmap = wx.BitmapFromImage(img)
         
         self.imgPane = wx.StaticBitmap(self, bitmap=self.bitmap)
@@ -200,10 +201,12 @@ class MainWindow(wx.Frame):
         self.SetTitle("CoPy - Backup")
         self.SetSize((560, 400))
         
+        ico = wx.Icon(tools.getResource('imgs/icon.ico'), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(ico)
+        
         self.winBox = wx.BoxSizer(wx.HORIZONTAL)
         self.panel = wx.Panel(self)    
         self.winBox.Add(self.panel, 0, wx.EXPAND | wx.ALL, 0)    
-        
 
         self.headpanel          = HeadPanel(self, self.panel)
         self.sourcepanel        = SourcePanel(self, self.panel)

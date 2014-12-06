@@ -4,7 +4,8 @@ a = Analysis(['../src/main.py'],
              hiddenimports=[],
              hookspath=None)
 
-a.datas += [('imgs/logo.png', '../src/imgs/logo.png','DATA')]
+a.datas += [('imgs/logo.png', '../src/imgs/logo.png','DATA'), 
+('imgs/icon.ico', '../src/imgs/icon.ico','DATA'),]
  
 
 pyz = PYZ(a.pure)
@@ -17,6 +18,7 @@ exe = EXE(pyz,
           debug=False,
           strip=None,
           upx=True,
-          console=True , manifest='manifest.xml')
+          console=True , manifest='manifest.xml',
+          icon=r'imgs/icon.ico')
 app = BUNDLE(exe,
              name=os.path.join('dist', 'CoPy.app'))
