@@ -16,6 +16,13 @@ After restarting the tool the last session is loaded. You are able to start the 
  - Stand-alone builds for linux and windows
  - Languages: English, German
 
+### Download ###
+ - Linux: https://github.com/MilchReis/CoPy/raw/master/bin/CoPy
+ - Windows: https://github.com/MilchReis/CoPy/raw/master/bin/CoPy.exe
+ - Source https://github.com/MilchReis/CoPy/archive/master.zip
+    - start with src/main.py
+    - see dependencies (https://github.com/MilchReis/CoPy#dependencies)
+
 ### Use instructions ###
  - Choose your backup directories
  - Choose a destination directory (maybe a USB-Drive)
