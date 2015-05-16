@@ -14,7 +14,9 @@ class WaitDialog(wx.Dialog):
 
         self.max = 0
         
-        self.label = wx.StaticText(self, label=lang.LABEL_WAIT_HEADER.decode("utf-8"))
+        text = "{} ...\n{}".format(lang.LABEL_WAIT_HEADER.decode("utf-8"),
+                                  lang.LABEL_CALC_FILES.decode("utf-8"))
+        self.label = wx.StaticText(self, label=text)
         self.gauge = wx.Gauge(self, range=0)
         
         self.stop = wx.Button(self, label=lang.LABEL_CANCEL.decode("utf-8"))
