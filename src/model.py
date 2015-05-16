@@ -21,15 +21,7 @@ class AppController():
         self.view.setNotifyHook(self.handleEvent)
         self.waitview = gui.WaitDialog(self.view)
         
-        # read session file
-        if os.path.exists(session):
-            files = tools.readIn(session)
-            
-            if(len(files) >= 2):
-                self.appmodel.destination = files[0]
-                self.appmodel.setSource(files[1:])
-                    
-            self.view.update(self.appmodel)
+        self.view.update(self.appmodel)
     
             
     def handleEvent(self, message):
@@ -69,6 +61,15 @@ class AppModel():
         
         self.__val = 0
         self.__updateCallback = None
+        
+        # read session file
+        if os.path.exists(session):
+            files = tools.readIn(session)
+            
+            if(len(files) >= 2):
+                self.destination = files[0]
+                self.setSource(files[1:])
+
     
     def setSource(self, array):
         for e in array:
