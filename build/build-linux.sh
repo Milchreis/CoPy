@@ -1,5 +1,5 @@
-pyinstaller-2.0/pyinstaller.py -F -m manifest.xml -n CoPy -w -o ../bin/ CoPy.spec
-cp ./dist/CoPy ../bin/CoPy
+pyinstaller-2.0/pyinstaller.py -F -m manifest.xml -n PicSort -w -o ../bin/ PicSort.spec
+cp ./dist/PicSort ../bin/PicSort
 
 rm -r ./build
 rm -r ./dist
