@@ -1,4 +1,4 @@
-CoPy
+CoPy - Deprecated: see [JCopy](https://github.com/Milchreis/JCopy)
 ====
 
 A small and simple backup tool for coping your data.
